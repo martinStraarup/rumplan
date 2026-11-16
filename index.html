@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rumplan – indret dit rum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3efe6;--panel:#fbf9f4;--ink:#22252a;--muted:#6f6c64;--line:#ddd6c8;
+  --accent:#c4512a;--accent-soft:#f6e2d8;--floor:#fffdf8;--wall:#373a3f;--sel:#c4512a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--paper);font-size:14px;display:flex;flex-direction:column}
+header{min-height:54px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+.brand{font-weight:600;letter-spacing:.01em;margin-right:auto;display:flex;gap:10px;align-items:baseline;font-size:16px}
+.brand small{font-family:'IBM Plex Mono',monospace;color:var(--muted);font-weight:400;font-size:12px}
+.brand svg{align-self:center}
+main{flex:1;display:grid;grid-template-columns:272px 1fr 290px;min-height:0}
+aside{overflow:auto;background:var(--panel);border-right:1px solid var(--line);padding:4px 16px 24px}
+aside.right{border-right:0;border-left:1px solid var(--line)}
+section{padding:14px 0;border-bottom:1px solid var(--line)}
+section:last-child{border-bottom:0}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0 0 10px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:9px}
+label{font-size:12px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+input[type=number],input[type=text],select,textarea{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;font:inherit;font-size:13px;color:var(--ink)}
+input[type=number]{font-family:'IBM Plex Mono',monospace}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.unitwrap{position:relative}
+.unitwrap span{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;pointer-events:none}
+.unitwrap input{padding-right:30px}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;padding:6px 10px;cursor:pointer;line-height:1.2}
+button:hover{border-color:#b9af9b}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.danger{color:#a8321c}
+button.warnbtn{background:#a8321c;color:#fff;border-color:#a8321c}
+button:disabled{opacity:.4;cursor:default}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+.seg button{border:0;border-radius:0;padding:5px 13px}
+.seg button.on{background:var(--ink);color:#fff}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.preset{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:7px 9px;gap:2px}
+.preset b{font-weight:500;font-size:12.5px}
+.preset small{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted)}
+.cat{font-size:11.5px;color:var(--muted);margin:12px 0 6px;font-weight:500}
+.cat:first-of-type{margin-top:0}
+.list{display:flex;flex-direction:column;gap:2px}
+.li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;border:1px solid transparent;font-size:13px}
+.li:hover{background:#f1ede4}
+.li.on{background:var(--accent-soft);border-color:#ebc4b2}
+.dot{width:12px;height:12px;border-radius:3px;flex:none;border:1px solid rgba(0,0,0,.25)}
+.li .meta{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+.li .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swatches{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sw{width:24px;height:24px;border-radius:5px;padding:0;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.sw.on{box-shadow:0 0 0 2px var(--ink)}
+input[type=color]{width:34px;height:28px;padding:1px;border:1px solid var(--line);border-radius:5px;background:#fff;cursor:pointer}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.readout{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:4px}
+.empty{color:var(--muted);font-size:13px;line-height:1.55}
+.empty kbd,.hint kbd{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.warn{background:#fdecea;color:#8f2a17;border-radius:6px;padding:7px 9px;font-size:12px;margin-top:10px}
+.stage{position:relative;min-width:0;min-height:0;overflow:hidden}
+#plan{width:100%;height:100%;display:block;touch-action:none;cursor:grab;background:var(--paper)}
+.hint{position:absolute;left:12px;bottom:12px;font-size:11.5px;color:var(--muted);background:rgba(251,249,244,.92);padding:6px 10px;border-radius:6px;border:1px solid var(--line);max-width:calc(100% - 200px)}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:4px}
+.zoom button{background:rgba(255,255,255,.95)}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);margin-bottom:7px;cursor:pointer}
+.check input{accent-color:var(--ink)}
+.modal{position:fixed;inset:0;background:rgba(25,22,18,.38);display:flex;align-items:center;justify-content:center;z-index:10;padding:16px}
+.modal[hidden]{display:none}
+.card{background:var(--panel);border-radius:12px;padding:20px;width:min(540px,100%);box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.card h3{margin:0 0 6px;font-size:16px}
+.card p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
+.card textarea{height:220px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;resize:vertical}
+.msg{font-size:12.5px;min-height:18px;margin-top:6px}
+.sep{width:1px;height:22px;background:var(--line);margin:0 2px}
+#plan text{pointer-events:none;user-select:none;-webkit-user-select:none}
+#plan .mono{font-family:'IBM Plex Mono',monospace}
+#plan .sans{font-family:'IBM Plex Sans',sans-serif}
+#plan .vs{vector-effect:non-scaling-stroke}
+#plan .item{cursor:move}
+#plan .op{cursor:move}
+#plan .handle{fill:#fff;stroke:var(--sel);stroke-width:2;vector-effect:non-scaling-stroke}
+#plan [data-h=rc]{cursor:nwse-resize}
+#plan [data-h=rr]{cursor:ew-resize}
+#plan [data-h=rb]{cursor:ns-resize}
+#plan [data-h=size]{cursor:nwse-resize}
+#plan [data-h=rot]{cursor:alias}
+@media (max-width:920px){
+  html,body{height:auto}
+  main{grid-template-columns:1fr}
+  .stage{height:64vh;order:-1;border-bottom:1px solid var(--line)}
+  aside,aside.right{border:0;border-bottom:1px solid var(--line)}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="17" fill="none" stroke="#22252a" stroke-width="3"/><rect x="6" y="9" width="7" height="5" fill="#c4512a"/></svg>
+    Rumplan <small>indret dit rum</small>
+  </div>
+  <button data-act="undo" id="undoBtn" title="Fortryd (Ctrl+Z)">↶ Fortryd</button>
+  <button data-act="redo" id="redoBtn" title="Annullér fortryd (Ctrl+Shift+Z)">↷ Gentag</button>
+  <span class="sep"></span>
+  <button data-act="io">Gem / indlæs</button>
+  <button data-act="reset" id="resetBtn" class="danger">Nulstil</button>
+</header>
+
+<main>
+  <aside>
+    <section>
+      <h2>Rum <span class="seg" id="unitSeg"><button data-act="unit" data-v="cm">cm</button><button data-act="unit" data-v="m">m</button></span></h2>
+      <div id="roomBox"></div>
+      <div class="readout" id="roomReadout"></div>
+      <div class="empty" style="font-size:12px;margin-top:6px">Indvendige mål. Træk i de små firkanter i væggen for at ændre størrelsen.</div>
+    </section>
+    <section>
+      <h2>Døre &amp; vinduer</h2>
+      <div class="btnrow" style="margin:0 0 8px">
+        <button data-act="add-door">+ Dør</button>
+        <button data-act="add-window">+ Vindue</button>
+      </div>
+      <div class="list" id="opList"></div>
+    </section>
+    <section>
+      <h2>Tilføj møbel</h2>
+      <div id="presetBox"></div>
+    </section>
+  </aside>
+
+  <div class="stage" id="stage">
+    <svg id="plan" xmlns="http://www.w3.org/2000/svg"><g id="scene"></g></svg>
+    <div class="hint">Træk for at flytte · træk i baggrunden for at panorere · scroll/knib for zoom · <kbd>R</kbd> roterer · <kbd>Del</kbd> sletter</div>
+    <div class="zoom">
+      <button data-act="zoomout" title="Zoom ud">−</button>
+      <button data-act="fit">Tilpas</button>
+      <button data-act="zoomin" title="Zoom ind">+</button>
+    </div>
+  </div>
+
+  <aside class="right">
+    <section>
+      <h2 id="selTitle">Valgt</h2>
+      <div id="selBox"></div>
+    </section>
+    <section>
+      <h2>Møbler i rummet <span id="itemCount"></span></h2>
+      <div class="list" id="itemList"></div>
+    </section>
+    <section>
+      <h2>Visning</h2>
+      <label class="check"><input type="checkbox" data-setting="grid"> Vis gitter (10 cm)</label>
+      <label class="check"><input type="checkbox" data-setting="dims"> Vis mål og afstande</label>
+      <label class="check"><input type="checkbox" data-setting="snap"> Fastgør til gitter</label>
+      <div class="field" style="margin-top:4px"><label>Gitter-trin</label>
+        <select data-setting="step"><option value="1">1 cm</option><option value="5">5 cm</option><option value="10">10 cm</option><option value="25">25 cm</option></select>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="card">
+    <h3>Gem / indlæs plan</h3>
+    <p>Planen gemmes automatisk i denne browser. Vil du gemme den andre steder, så kopiér teksten herunder og gem den fx i en note. For at hente en plan igen: indsæt teksten og tryk "Indlæs".</p>
+    <textarea id="io" spellcheck="false"></textarea>
+    <div class="msg" id="iomsg"></div>
+    <div class="btnrow">
+      <button class="primary" data-act="copy">Kopiér</button>
+      <button data-act="load">Indlæs</button>
+      <button data-act="close" style="margin-left:auto">Luk</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const PALETTE=['#e07a5f','#3d5a80','#81b29a','#f2cc8f','#6d597a','#98c1d9','#bc6c25','#2a9d8f','#b56576','#8d99ae','#e9c46a','#588157'];
+const PRESETS=[
+  {cat:'Stue',name:'Sofa (3 pers.)',shape:'rect',w:210,d:90},
+  {cat:'Stue',name:'Hjørnesofa',shape:'L',w:260,d:200,arm:90},
+  {cat:'Stue',name:'Lænestol',shape:'rect',w:80,d:80},
+  {cat:'Stue',name:'Sofabord',shape:'rect',w:120,d:60},
+  {cat:'Stue',name:'TV-bord',shape:'rect',w:160,d:40},
+  {cat:'Stue',name:'Reol',shape:'rect',w:80,d:35},
+  {cat:'Stue',name:'Rundt tæppe',shape:'circle',w:200,d:200},
+  {cat:'Stue',name:'Tæppe',shape:'rect',w:240,d:170},
+  {cat:'Spisestue',name:'Spisebord',shape:'rect',w:180,d:90},
+  {cat:'Spisestue',name:'Rundt bord',shape:'circle',w:110,d:110},
+  {cat:'Spisestue',name:'Stol',shape:'rect',w:45,d:50},
+  {cat:'Spisestue',name:'Skænk',shape:'rect',w:160,d:45},
+  {cat:'Soveværelse',name:'Dobbeltseng',shape:'rect',w:180,d:200},
+  {cat:'Soveværelse',name:'Enkeltseng',shape:'rect',w:90,d:200},
+  {cat:'Soveværelse',name:'Natbord',shape:'rect',w:45,d:40},
+  {cat:'Soveværelse',name:'Garderobe',shape:'rect',w:100,d:60},
+  {cat:'Soveværelse',name:'Kommode',shape:'rect',w:80,d:45},
+  {cat:'Arbejde',name:'Skrivebord',shape:'rect',w:140,d:70},
+  {cat:'Arbejde',name:'Hjørneskrivebord',shape:'L',w:160,d:140,arm:65},
+  {cat:'Arbejde',name:'Kontorstol',shape:'circle',w:60,d:60},
+  {cat:'Fri form',name:'Rektangel',shape:'rect',w:100,d:60},
+  {cat:'Fri form',name:'Rund / oval',shape:'circle',w:80,d:80},
+  {cat:'Fri form',name:'L-form',shape:'L',w:150,d:120,arm:50},
+];
+const WALLS={top:'Øverste væg',right:'Højre væg',bottom:'Nederste væg',left:'Venstre væg'};
+const SHAPES={rect:'Rektangel',circle:'Rund / oval',L:'L-form'};
+const KEY='rumplan.v1';
+const svg=document.getElementById('plan'), scene=document.getElementById('scene'), stage=document.getElementById('stage');
+const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,9);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const r1=v=>Math.round(v*10)/10;
+
+function defaultState(){
+  return {unit:'cm',room:{w:450,d:350,wall:20},
+    openings:[{id:uid(),type:'door',wall:'bottom',offset:40,width:90,hinge:'left',dir:'in'},{id:uid(),type:'window',wall:'top',offset:150,width:150}],
+    items:[],settings:{grid:true,dims:true,snap:true,step:5}};
+}
+function sanitize(o){
+  const d=defaultState();
+  if(!o||typeof o!=='object'||!o.room) throw new Error('bad');
+  const num=(v,f)=>isFinite(+v)?+v:f;
+  return {unit:o.unit==='m'?'m':'cm',
+    room:{w:num(o.room.w,d.room.w),d:num(o.room.d,d.room.d),wall:num(o.room.wall,d.room.wall)},
+    openings:(Array.isArray(o.openings)?o.openings:[]).filter(x=>x&&WALLS[x.wall]).map(x=>({id:x.id||uid(),type:x.type==='window'?'window':'door',wall:x.wall,offset:num(x.offset,0),width:num(x.width,90),hinge:x.hinge==='right'?'right':'left',dir:x.dir==='out'?'out':'in'})),
+    items:(Array.isArray(o.items)?o.items:[]).filter(x=>x&&SHAPES[x.shape]).map(x=>({id:x.id||uid(),name:String(x.name||'Møbel'),shape:x.shape,w:num(x.w,80),d:num(x.d,60),arm:num(x.arm,50),rot:num(x.rot,0),mirror:!!x.mirror,x:num(x.x,100),y:num(x.y,100),color:/^#[0-9a-f]{6}$/i.test(x.color)?x.color:PALETTE[0]})),
+    settings:{...d.settings,...(o.settings||{})}};
+}
+
+let state;
+try{const raw=localStorage.getItem(KEY);state=raw?sanitize(JSON.parse(raw)):defaultState();}catch(e){state=defaultState();}
+let sel=null, drag=null, moved=false;
+const view={x:-50,y:-50,s:1};
+let hist=[],fut=[],lastSnap=JSON.stringify(state);
+
+/* ---------- units ---------- */
+const toUnit=cm=>state.unit==='m'?+(cm/100).toFixed(3):r1(cm);
+const fromUnit=v=>state.unit==='m'?v*100:v;
+const nf=(v,dec)=>v.toLocaleString('da-DK',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+const fmt=cm=>state.unit==='m'?nf(cm/100,2)+' m':nf(Math.round(cm),0)+' cm';
+const fmtPair=(a,b)=>state.unit==='m'?`${nf(a/100,2)} × ${nf(b/100,2)} m`:`${Math.round(a)} × ${Math.round(b)} cm`;
+
+/* ---------- geometry ---------- */
+const wallLen=w=>(w==='top'||w==='bottom')?state.room.w:state.room.d;
+function wallMatrix(w){const {w:W,d:D}=state.room;return {top:[1,0,0,1,0,0],bottom:[1,0,0,-1,0,D],left:[0,1,1,0,0,0],right:[0,1,-1,0,W,0]}[w];}
+function w2g(w,u,v){const [a,b,c,d,e,f]=wallMatrix(w);return {x:a*u+c*v+e,y:b*u+d*v+f};}
+function localPts(it){
+  const w=it.w/2,d=it.d/2;
+  if(it.shape==='L'){const a=it.arm;let p=[[-w,-d],[-w+a,-d],[-w+a,d-a],[w,d-a],[w,d],[-w,d]];if(it.mirror)p=p.map(([x,y])=>[-x,y]);return p;}
+  return [[-w,-d],[w,-d],[w,d],[-w,d]];
+}
+function bbox(it){
+  const r=it.rot*Math.PI/180,c=Math.cos(r),s=Math.sin(r);
+  if(it.shape==='circle'){const a=it.w/2,b=it.d/2,hw=Math.hypot(a*c,b*s),hh=Math.hypot(a*s,b*c);return {minX:it.x-hw,maxX:it.x+hw,minY:it.y-hh,maxY:it.y+hh};}
+  let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9;
+  for(const [x,y] of localPts(it)){const gx=x*c-y*s+it.x,gy=x*s+y*c+it.y;mnx=Math.min(mnx,gx);mxx=Math.max(mxx,gx);mny=Math.min(mny,gy);mxy=Math.max(mxy,gy);}
+  return {minX:mnx,maxX:mxx,minY:mny,maxY:mxy};
+}
+function outside(it){const b=bbox(it),{w:W,d:D}=state.room;return b.minX<-0.5||b.minY<-0.5||b.maxX>W+0.5||b.maxY>D+0.5;}
+function normalize(){
+  const R=state.room;R.w=clamp(R.w,30,5000);R.d=clamp(R.d,30,5000);R.wall=clamp(R.wall,0,100);
+  for(const op of state.openings){const L=wallLen(op.wall);op.width=clamp(op.width,10,L);op.offset=clamp(op.offset,0,L-op.width);}
+  for(const it of state.items){it.w=Math.max(5,it.w);it.d=Math.max(5,it.d);if(it.shape==='L')it.arm=clamp(it.arm,5,Math.max(5,Math.min(it.w,it.d)-5));}
+}
+const snapV=v=>state.settings.snap?Math.round(v/state.settings.step)*state.settings.step:r1(v);
+function contrast(hex){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (0.299*r+0.587*g+0.114*b)>150?'#1d1f22':'#ffffff';}
+
+/* ---------- selection ---------- */
+const selItem=()=>sel&&sel.kind==='item'?state.items.find(i=>i.id===sel.id)||null:null;
+const selOp=()=>sel&&sel.kind==='op'?state.openings.find(o=>o.id===sel.id)||null:null;
+const isSel=(k,id)=>sel&&sel.kind===k&&sel.id===id;
+function setSel(s){sel=s;renderScene();renderPanels();}
+
+/* ---------- view ---------- */
+function applyView(){const r=svg.getBoundingClientRect();if(!r.width)return;svg.setAttribute('viewBox',`${view.x} ${view.y} ${r.width/view.s} ${r.height/view.s}`);}
+function toModel(e){const r=svg.getBoundingClientRect();return {x:view.x+(e.clientX-r.left)/view.s,y:view.y+(e.clientY-r.top)/view.s};}
+function fit(){
+  const r=svg.getBoundingClientRect();if(!r.width)return;
+  const {w:W,d:D,wall:T}=state.room,pad=Math.min(80,r.width*0.12);
+  view.s=clamp(Math.min((r.width-2*pad)/(W+2*T),(r.height-2*pad)/(D+2*T)),0.05,20);
+  view.x=W/2-r.width/2/view.s-10/view.s;view.y=D/2-r.height/2/view.s-10/view.s;
+  applyView();renderScene();
+}
+function zoomAt(p,f){const ns=clamp(view.s*f,0.05,20);view.x=p.x-(p.x-view.x)*(view.s/ns);view.y=p.y-(p.y-view.y)*(view.s/ns);view.s=ns;applyView();renderScene();}
+
+/* ---------- svg helpers ---------- */
+function txt(x,y,str,o={}){
+  const fs=(o.size||11)/view.s,rot=o.rot||0;
+  const halo=o.halo===false?'':`stroke="${o.halo||'var(--paper)'}" stroke-width="${3.5/view.s}" paint-order="stroke" stroke-linejoin="round"`;
+  return `<text x="${x}" y="${y}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="${o.color||'var(--ink)'}" font-weight="${o.weight||400}" ${halo} ${rot?`transform="rotate(${rot} ${x} ${y})"`:''} class="${o.sans?'sans':'mono'}">${esc(str)}</text>`;
+}
+function dimLine(x1,y1,x2,y2,label,col,halo){
+  const u=1/view.s,vert=Math.abs(x2-x1)<Math.abs(y2-y1),tk=4*u;
+  let s=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="1" stroke-dasharray="${4*u} ${3*u}" class="vs"/>`;
+  s+=vert?`<path d="M${x1-tk} ${y1}H${x1+tk}M${x2-tk} ${y2}H${x2+tk}" stroke="${col}" stroke-width="1" class="vs"/>`
+         :`<path d="M${x1} ${y1-tk}V${y1+tk}M${x2} ${y2-tk}V${y2+tk}" stroke="${col}" stroke-width="1" class="vs"/>`;
+  s+=txt((x1+x2)/2,(y1+y2)/2,label,{color:col,rot:vert?-90:0,halo,size:11});
+  return s;
+}
+function shapeSvg(it,attrs){
+  if(it.shape==='circle')return `<ellipse cx="0" cy="0" rx="${it.w/2}" ry="${it.d/2}" ${attrs}/>`;
+  if(it.shape==='L')return `<polygon points="${localPts(it).map(p=>p.join(',')).join(' ')}" ${attrs}/>`;
+  return `<rect x="${-it.w/2}" y="${-it.d/2}" width="${it.w}" height="${it.d}" rx="${Math.min(3,it.w/10,it.d/10)}" ${attrs}/>`;
+}
+
+/* ---------- scene ---------- */
+function renderScene(){
+  normalize();
+  const {w:W,d:D,wall:T}=state.room,u=1/view.s,S=state.settings;
+  let h='<defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">';
+  if(view.s*10>=5)for(let i=1;i<10;i++)h+=`<path d="M${i*10} 0V100M0 ${i*10}H100" stroke="#eee8db" stroke-width="${u}"/>`;
+  h+=`<path d="M0 0H100M0 0V100" stroke="#d8cfbb" stroke-width="${u*1.2}" fill="none"/></pattern></defs>`;
+  h+=`<rect x="0" y="0" width="${W}" height="${D}" fill="var(--floor)"/>`;
+  if(S.grid)h+=`<rect x="0" y="0" width="${W}" height="${D}" fill="url(#grid)"/>`;
+  h+=`<path d="M${-T} ${-T}H${W+T}V${D+T}H${-T}Z M0 0V${D}H${W}V0Z" fill="var(--wall)" fill-rule="evenodd"/>`;
+  h+=`<rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="var(--wall)" stroke-width="1.5" class="vs"/>`;
+
+  // openings
+  for(const op of state.openings){
+    const o=op.offset,w=op.width,on=isSel('op',op.id),col=on?'var(--sel)':'var(--ink)';
+    h+=`<g transform="matrix(${wallMatrix(op.wall).join(' ')})" class="op" data-op="${op.id}">`;
+    h+=`<rect x="${o}" y="${-T-0.5}" width="${w}" height="${T+1}" fill="var(--floor)"/>`;
+    if(op.type==='window'){
+      h+=`<rect x="${o}" y="${-T}" width="${w}" height="${T}" fill="#dcecf5" stroke="${col}" stroke-width="1.2" class="vs"/>`;
+      h+=`<line x1="${o}" y1="${-T/2}" x2="${o+w}" y2="${-T/2}" stroke="${col}" stroke-width="1.2" class="vs"/>`;
+    }else{
+      const hu=op.hinge==='left'?o:o+w,ou=op.hinge==='left'?o+w:o,sg=op.dir==='in'?1:-1,base=op.dir==='in'?0:-T,du=Math.sign(ou-hu);
+      const pts=[];for(let i=0;i<=24;i++){const a=Math.PI/2*(1-i/24);pts.push(`${hu+du*w*Math.cos(a)},${base+sg*w*Math.sin(a)}`);}
+      h+=`<polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="1" stroke-dasharray="${4*u} ${3*u}" class="vs"/>`;
+      h+=`<line x1="${hu}" y1="${base}" x2="${hu}" y2="${base+sg*w}" stroke="${col}" stroke-width="3" class="vs"/>`;
+      h+=`<path d="M${o} ${-T}V0M${o+w} ${-T}V0" stroke="${col}" stroke-width="1.2" class="vs"/>`;
+    }
+    const pad=7*u;
+    h+=`<rect x="${o}" y="${-T-pad}" width="${w}" height="${T+2*pad}" fill="transparent"/>`;
+    if(on)h+=`<rect x="${o}" y="${-T}" width="${w}" height="${Math.max(T,1)}" fill="none" stroke="var(--sel)" stroke-width="2.5" class="vs"/>`;
+    h+='</g>';
+  }
+
+  // items
+  const sIt=selItem();
+  for(const it of state.items){
+    const on=sIt===it,out=outside(it);
+    const stroke=on?'var(--sel)':out?'#c0261a':'rgba(0,0,0,.45)';
+    h+=`<g class="item" data-item="${it.id}" transform="translate(${it.x} ${it.y}) rotate(${it.rot})">${shapeSvg(it,`fill="${it.color}" fill-opacity="0.9" stroke="${stroke}" stroke-width="${on?2.4:out?1.8:1.2}" ${out&&!on?`stroke-dasharray="${5*u} ${3*u}"`:''} class="vs"`)}</g>`;
+    h+=labelSvg(it);
+  }
+
+  // dimensions
+  if(S.dims){
+    const off=24*u,tk=5*u,y0=-T-off,x0=-T-off;
+    h+=`<path d="M0 ${y0}H${W}M0 ${y0-tk}V${y0+tk}M${W} ${y0-tk}V${y0+tk}M${x0} 0V${D}M${x0-tk} 0H${x0+tk}M${x0-tk} ${D}H${x0+tk}" stroke="var(--muted)" stroke-width="1" fill="none" class="vs"/>`;
+    h+=txt(W/2,y0,fmt(W),{size:12,weight:500});
+    h+=txt(x0,D/2,fmt(D),{size:12,weight:500,rot:-90});
+    if(sIt){
+      const b=bbox(sIt),cx=(b.minX+b.maxX)/2,cy=(b.minY+b.maxY)/2,col='var(--accent)',hl='var(--floor)';
+      if(b.minX>1)h+=dimLine(0,cy,b.minX,cy,fmt(b.minX),col,hl);
+      if(W-b.maxX>1)h+=dimLine(b.maxX,cy,W,cy,fmt(W-b.maxX),col,hl);
+      if(b.minY>1)h+=dimLine(cx,0,cx,b.minY,fmt(b.minY),col,hl);
+      if(D-b.maxY>1)h+=dimLine(cx,b.maxY,cx,D,fmt(D-b.maxY),col,hl);
+    }
+    const sOp=selOp();
+    if(sOp){
+      const L=wallLen(sOp.wall),v=18*u,col='var(--accent)';
+      for(const [a,b] of [[0,sOp.offset],[sOp.offset,sOp.offset+sOp.width],[sOp.offset+sOp.width,L]]){
+        if(b-a<1)continue;const p1=w2g(sOp.wall,a,v),p2=w2g(sOp.wall,b,v);
+        h+=dimLine(p1.x,p1.y,p2.x,p2.y,fmt(b-a),col,'var(--floor)');
+      }
+    }
+  }
+
+  // room handles
+  const hs=11*u;
+  for(const [k,x,y] of [['rc',W+T/2,D+T/2],['rr',W+T/2,D/2],['rb',W/2,D+T/2]])
+    h+=`<rect data-h="${k}" class="handle" x="${x-hs/2}" y="${y-hs/2}" width="${hs}" height="${hs}" rx="${2*u}"/>`;
+
+  // item handles
+  if(sIt){
+    const r=7*u,ly=-sIt.d/2-26*u;
+    h+=`<g transform="translate(${sIt.x} ${sIt.y}) rotate(${sIt.rot})">`;
+    h+=`<line x1="0" y1="${-sIt.d/2}" x2="0" y2="${ly}" stroke="var(--sel)" stroke-width="1.5" class="vs"/>`;
+    h+=`<circle data-h="rot" class="handle" cx="0" cy="${ly}" r="${r}"/>`;
+    h+=`<path d="M${-3*u} ${ly-1*u}a${3*u} ${3*u} 0 1 1 ${3*u} ${3.5*u}" fill="none" stroke="var(--sel)" stroke-width="1.3" class="vs" pointer-events="none"/>`;
+    h+=`<rect data-h="size" class="handle" x="${sIt.w/2-r}" y="${sIt.d/2-r}" width="${2*r}" height="${2*r}" rx="${2*u}"/>`;
+    h+='</g>';
+  }
+  scene.innerHTML=h;
+}
+function labelSvg(it){
+  const b=bbox(it),u=1/view.s;
+  let cx=it.x,cy=it.y,aw=(b.maxX-b.minX)*0.9,ah=(b.maxY-b.minY)*0.9;
+  if(it.shape==='L'){
+    const r=it.rot*Math.PI/180,c=Math.cos(r),s=Math.sin(r),lx=0,ly=it.d/2-it.arm/2;
+    cx=it.x+lx*c-ly*s;cy=it.y+lx*s+ly*c;
+    const hor=Math.abs(c)>0.7;aw=(hor?it.w:it.arm)*0.85;ah=(hor?it.arm:it.w)*0.85;
+  }
+  if(it.shape==='circle'){aw*=0.8;ah*=0.8;}
+  const name=it.name||'';
+  let fs=12*u;const est=Math.max(1,name.length)*0.56*fs;if(est>aw)fs=aw/(Math.max(1,name.length)*0.56);
+  if(fs*view.s<6.5||fs>ah)return '';
+  const col=contrast(it.color),dims=fmtPair(it.w,it.d);
+  let fs2=Math.min(10*u,fs*0.85);const showDims=ah>fs*1.2+fs2*1.4&&dims.length*0.6*fs2<aw&&fs2*view.s>=6.5;
+  const dy=showDims?fs*0.55:0;
+  let s=`<text x="${cx}" y="${cy-dy}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="${col}" font-weight="500" class="sans">${esc(name)}</text>`;
+  if(showDims)s+=`<text x="${cx}" y="${cy+fs*0.75}" font-size="${fs2}" text-anchor="middle" dominant-baseline="central" fill="${col}" fill-opacity=".8" class="mono">${dims}</text>`;
+  return s;
+}
+
+/* ---------- panels ---------- */
+function numIn(bind,label,len=true){
+  const step=len?(state.unit==='m'?0.01:1):1;
+  return `<div class="field"><label>${label}</label><div class="unitwrap"><input type="number" data-bind="${bind}" ${len?'data-len="1"':''} step="${step}" inputmode="decimal"><span>${len?state.unit:'°'}</span></div></div>`;
+}
+function renderPanels(){
+  document.querySelectorAll('#unitSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===state.unit));
+  $('roomBox').innerHTML=`<div class="row2">${numIn('room.w','Bredde')}${numIn('room.d','Dybde')}</div>${numIn('room.wall','Vægtykkelse')}`;
+  // selected
+  const it=selItem(),op=selOp();let h='';
+  if(it){
+    $('selTitle').textContent='Valgt møbel';
+    h+=`<div class="field"><label>Navn</label><input type="text" data-text="name" value="${esc(it.name)}"></div>`;
+    h+=`<div class="field"><label>Form</label><select data-itf="shape">${Object.entries(SHAPES).map(([k,v])=>`<option value="${k}" ${k===it.shape?'selected':''}>${v}</option>`).join('')}</select></div>`;
+    h+=`<div class="row2">${numIn('item.w',it.shape==='circle'?'Diameter (bredde)':'Bredde')}${numIn('item.d',it.shape==='circle'?'Diameter (dybde)':'Dybde')}</div>`;
+    if(it.shape==='L')h+=`<div class="row2">${numIn('item.arm','Armbredde')}<div class="field"><label>&nbsp;</label><label class="check" style="margin:6px 0 0"><input type="checkbox" data-check="mirror" ${it.mirror?'checked':''}> Spejlvend</label></div></div>`;
+    h+=`<div class="row2">${numIn('item.left','Fra venstre væg')}${numIn('item.top','Fra øverste væg')}</div>`;
+    h+=`<div class="row2">${numIn('item.rot','Rotation',false)}<div class="field"><label>&nbsp;</label><div style="display:flex;gap:4px"><button data-act="rot" data-v="-90" title="Drej 90° mod uret" style="flex:1">↺ 90°</button><button data-act="rot" data-v="90" title="Drej 90° med uret" style="flex:1">↻ 90°</button></div></div></div>`;
+    h+=`<div class="field"><label>Farve</label><div class="swatches">${PALETTE.map(c=>`<button class="sw ${c.toLowerCase()===it.color.toLowerCase()?'on':''}" style="background:${c}" data-act="swatch" data-c="${c}" title="${c}"></button>`).join('')}<input type="color" data-color value="${it.color}" title="Vælg egen farve"></div></div>`;
+    h+=`<div class="btnrow"><button data-act="dup">Duplikér</button><button data-act="front">Læg øverst</button><button data-act="back">Læg nederst</button><button data-act="del" class="danger">Slet</button></div>`;
+    if(outside(it))h+=`<div class="warn">Møblet går ud over rummets vægge.</div>`;
+  }else if(op){
+    const isDoor=op.type==='door',vert=op.wall==='left'||op.wall==='right';
+    $('selTitle').textContent=isDoor?'Valgt dør':'Valgt vindue';
+    h+=`<div class="row2"><div class="field"><label>Type</label><select data-opf="type"><option value="door" ${isDoor?'selected':''}>Dør</option><option value="window" ${!isDoor?'selected':''}>Vindue</option></select></div>`;
+    h+=`<div class="field"><label>Væg</label><select data-opf="wall">${Object.entries(WALLS).map(([k,v])=>`<option value="${k}" ${k===op.wall?'selected':''}>${v.replace(' væg','')}</option>`).join('')}</select></div></div>`;
+    h+=`<div class="row2">${numIn('op.width','Bredde')}${numIn('op.offset',vert?'Fra øverste hjørne':'Fra venstre hjørne')}</div>`;
+    if(isDoor){
+      const hingeTxt=op.hinge==='left'?(vert?'øverst':'venstre'):(vert?'nederst':'højre');
+      h+=`<div class="readout" style="margin-bottom:4px">Hængsel: ${hingeTxt} · åbner ${op.dir==='in'?'ind i rummet':'udad'}</div>`;
+      h+=`<div class="btnrow"><button data-act="hinge">Skift hængselside</button><button data-act="dir">Åbn ${op.dir==='in'?'udad':'indad'}</button></div>`;
+    }
+    h+=`<div class="btnrow"><button data-act="del" class="danger">Slet</button></div>`;
+  }else{
+    $('selTitle').textContent='Valgt';
+    h=`<div class="empty">Klik på et møbel, en dør eller et vindue for at ændre mål, farve og placering.<br><br>Genveje: <kbd>R</kbd> drej 90°, <kbd>Del</kbd> slet, <kbd>Ctrl</kbd>+<kbd>D</kbd> duplikér, piletaster flytter (hold <kbd>Shift</kbd> for 10&nbsp;cm).</div>`;
+  }
+  $('selBox').innerHTML=h;
+  document.querySelectorAll('[data-setting]').forEach(el=>{const v=state.settings[el.dataset.setting];if(el.type==='checkbox')el.checked=!!v;else el.value=String(v);});
+  renderLists();updatePanelValues();updateUndo();
+}
+function renderLists(){
+  const {w:W,d:D,wall:T}=state.room;
+  $('roomReadout').innerHTML=`Gulvareal: ${nf(W*D/10000,2)} m²<br>Udvendigt: ${fmtPair(W+2*T,D+2*T)}`;
+  $('opList').innerHTML=state.openings.length?state.openings.map(o=>`<div class="li ${isSel('op',o.id)?'on':''}" data-act="sel-op" data-id="${o.id}"><span class="dot" style="background:${o.type==='door'?'#fff':'#dcecf5'}"></span><span class="nm">${o.type==='door'?'Dør':'Vindue'}</span><span class="meta">${WALLS[o.wall].replace(' væg','')} · ${fmt(o.width)}</span></div>`).join(''):'<div class="empty">Ingen døre eller vinduer endnu.</div>';
+  $('itemCount').textContent=state.items.length?state.items.length:'';
+  $('itemList').innerHTML=state.items.length?state.items.slice().reverse().map(i=>`<div class="li ${isSel('item',i.id)?'on':''}" data-act="sel-item" data-id="${i.id}"><span class="dot" style="background:${i.color}"></span><span class="nm">${esc(i.name)}</span><span class="meta">${fmtPair(i.w,i.d)}${outside(i)?' ⚠':''}</span></div>`).join(''):'<div class="empty">Tilføj møbler fra listen til venstre.</div>';
+}
+function getVal(path){
+  const [k,f]=path.split('.');
+  if(k==='room')return state.room[f];
+  if(k==='item'){const it=selItem();if(!it)return null;if(f==='left')return bbox(it).minX;if(f==='top')return bbox(it).minY;return it[f];}
+  if(k==='op'){const op=selOp();return op?op[f]:null;}
+}
+function setVal(path,v){
+  const [k,f]=path.split('.');
+  if(k==='room'){state.room[f]=f==='wall'?clamp(v,0,100):clamp(v,30,5000);return;}
+  if(k==='item'){const it=selItem();if(!it)return;
+    if(f==='left')it.x+=v-bbox(it).minX;else if(f==='top')it.y+=v-bbox(it).minY;
+    else if(f==='rot')it.rot=((v%360)+360)%360;else it[f]=Math.max(5,v);return;}
+  if(k==='op'){const op=selOp();if(op)op[f]=v;}
+}
+function updatePanelValues(){
+  document.querySelectorAll('[data-bind]').forEach(el=>{
+    if(el===document.activeElement)return;const v=getVal(el.dataset.bind);if(v==null)return;
+    el.value=el.dataset.len?toUnit(v):Math.round(v);
+  });
+  if(!drag||drag.type==='pan')return;
+  renderLists();
+}
+function updateUndo(){$('undoBtn').disabled=!hist.length;$('redoBtn').disabled=!fut.length;}
+
+/* ---------- history ---------- */
+function save(){try{localStorage.setItem(KEY,lastSnap);}catch(e){}}
+function commit(){normalize();const s=JSON.stringify(state);if(s===lastSnap)return;hist.push(lastSnap);if(hist.length>150)hist.shift();fut=[];lastSnap=s;save();updateUndo();}
+function restore(s){state=JSON.parse(s);lastSnap=s;if(sel&&!(selItem()||selOp()))sel=null;save();renderScene();renderPanels();}
+function undo(){if(!hist.length)return;fut.push(lastSnap);restore(hist.pop());}
+function redo(){if(!fut.length)return;hist.push(lastSnap);restore(fut.pop());}
+
+/* ---------- actions ---------- */
+function addItem(p){
+  let x=state.room.w/2,y=state.room.d/2;
+  while(state.items.some(i=>Math.abs(i.x-x)<1&&Math.abs(i.y-y)<1)){x+=20;y+=20;}
+  const it={id:uid(),name:p.name,shape:p.shape,w:p.w,d:p.d,arm:p.arm||Math.round(Math.min(p.w,p.d)*0.4),rot:0,mirror:false,x,y,color:PALETTE[state.items.length%PALETTE.length]};
+  state.items.push(it);sel={kind:'item',id:it.id};commit();renderScene();renderPanels();
+}
+function addOpening(type){
+  const w=type==='door'?90:120,order=type==='door'?['bottom','left','right','top']:['top','right','left','bottom'];
+  for(const wall of order){
+    const L=wallLen(wall);if(L<w+10)continue;
+    const others=state.openings.filter(o=>o.wall===wall),cands=[(L-w)/2];
+    for(let o=20;o<=L-w-20;o+=10)cands.push(o);
+    for(const off of cands){
+      if(others.every(o=>off+w<=o.offset-10||off>=o.offset+o.width+10)){
+        const op={id:uid(),type,wall,offset:Math.round(off),width:w,hinge:'left',dir:'in'};
+        state.openings.push(op);sel={kind:'op',id:op.id};commit();renderScene();renderPanels();return;
+      }
+    }
+  }
+  const op={id:uid(),type,wall:'top',offset:0,width:Math.min(w,state.room.w),hinge:'left',dir:'in'};
+  state.openings.push(op);sel={kind:'op',id:op.id};commit();renderScene();renderPanels();
+}
+function deleteSel(){
+  if(selItem())state.items=state.items.filter(i=>i.id!==sel.id);
+  else if(selOp())state.openings=state.openings.filter(o=>o.id!==sel.id);
+  else return;
+  sel=null;commit();renderScene();renderPanels();
+}
+function duplicate(){
+  const it=selItem();if(!it)return;
+  const c={...it,id:uid(),x:it.x+20,y:it.y+20};state.items.push(c);sel={kind:'item',id:c.id};commit();renderScene();renderPanels();
+}
+function rotateSel(d){const it=selItem();if(!it)return;it.rot=(((it.rot+d)%360)+360)%360;commit();renderScene();updatePanelValues();renderLists();}
+
+let resetArmed=null;
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,it=selItem(),op=selOp();
+  switch(a){
+    case 'unit':state.unit=b.dataset.v;commit();renderScene();renderPanels();break;
+    case 'add-door':addOpening('door');break;
+    case 'add-window':addOpening('window');break;
+    case 'preset':addItem(PRESETS[+b.dataset.i]);break;
+    case 'sel-item':setSel({kind:'item',id:b.dataset.id});break;
+    case 'sel-op':setSel({kind:'op',id:b.dataset.id});break;
+    case 'rot':rotateSel(+b.dataset.v);break;
+    case 'dup':duplicate();break;
+    case 'front':if(it){state.items=state.items.filter(i=>i!==it).concat(it);commit();renderScene();renderLists();}break;
+    case 'back':if(it){state.items=[it].concat(state.items.filter(i=>i!==it));commit();renderScene();renderLists();}break;
+    case 'del':deleteSel();break;
+    case 'hinge':if(op){op.hinge=op.hinge==='left'?'right':'left';commit();renderScene();renderPanels();}break;
+    case 'dir':if(op){op.dir=op.dir==='in'?'out':'in';commit();renderScene();renderPanels();}break;
+    case 'swatch':if(it){it.color=b.dataset.c;commit();renderScene();renderPanels();}break;
+    case 'undo':undo();break;
+    case 'redo':redo();break;
+    case 'zoomin':{const r=svg.getBoundingClientRect();zoomAt(toModel({clientX:r.left+r.width/2,clientY:r.top+r.height/2}),1.25);break;}
+    case 'zoomout':{const r=svg.getBoundingClientRect();zoomAt(toModel({clientX:r.left+r.width/2,clientY:r.top+r.height/2}),0.8);break;}
+    case 'fit':fit();break;
+    case 'io':$('io').value=JSON.stringify(state,null,1);$('iomsg').textContent='';$('modal').hidden=false;break;
+    case 'close':$('modal').hidden=true;break;
+    case 'copy':{const ta=$('io');ta.select();
+      const ok=()=>{$('iomsg').style.color='#2f6b3a';$('iomsg').textContent='Kopieret til udklipsholderen.';};
+      try{navigator.clipboard.writeText(ta.value).then(ok,()=>{try{document.execCommand('copy');ok();}catch(_){$('iomsg').textContent='Teksten er markeret – tryk Ctrl+C for at kopiere.';}});}
+      catch(_){$('iomsg').textContent='Teksten er markeret – tryk Ctrl+C for at kopiere.';}
+      break;}
+    case 'load':{try{const s=sanitize(JSON.parse($('io').value));hist.push(lastSnap);fut=[];state=s;sel=null;lastSnap=JSON.stringify(state);save();renderPanels();fit();$('modal').hidden=true;}
+      catch(_){$('iomsg').style.color='#a8321c';$('iomsg').textContent='Teksten kunne ikke læses som en plan.';}break;}
+    case 'reset':
+      if(resetArmed){clearTimeout(resetArmed);resetArmed=null;b.textContent='Nulstil';b.className='danger';
+        hist.push(lastSnap);fut=[];state=defaultState();sel=null;lastSnap=JSON.stringify(state);save();renderPanels();fit();}
+      else{b.textContent='Klik igen for at nulstille';b.className='warnbtn';resetArmed=setTimeout(()=>{resetArmed=null;b.textContent='Nulstil';b.className='danger';},3000);}
+      break;
+  }
+});
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')$('modal').hidden=true;});
+
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.dataset.bind){
+    const v=parseFloat(String(el.value).replace(',','.'));if(!isFinite(v))return;
+    setVal(el.dataset.bind,el.dataset.len?fromUnit(v):v);renderScene();renderLists();
+  }else if(el.dataset.text!==undefined){const it=selItem();if(it){it.name=el.value;renderScene();renderLists();}}
+  else if(el.dataset.color!==undefined){const it=selItem();if(it){it.color=el.value;renderScene();renderLists();}}
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.dataset.bind||el.dataset.text!==undefined){commit();updatePanelValues();renderLists();return;}
+  if(el.dataset.color!==undefined){commit();renderPanels();return;}
+  if(el.dataset.opf){const op=selOp();if(!op)return;op[el.dataset.opf]=el.value;commit();renderScene();renderPanels();return;}
+  if(el.dataset.itf){const it=selItem();if(!it)return;it.shape=el.value;if(it.shape==='L'&&!(it.arm>0))it.arm=Math.round(Math.min(it.w,it.d)*0.4);commit();renderScene();renderPanels();return;}
+  if(el.dataset.check){const it=selItem();if(it){it[el.dataset.check]=el.checked;commit();renderScene();}return;}
+  if(el.dataset.setting){state.settings[el.dataset.setting]=el.type==='checkbox'?el.checked:+el.value;commit();renderScene();}
+});
+
+/* ---------- pointer ---------- */
+const pointers=new Map();
+svg.addEventListener('pointerdown',e=>{
+  if(e.button>0)return;
+  try{svg.setPointerCapture(e.pointerId);}catch(_){}
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size===2){
+    const [a,b]=[...pointers.values()];
+    drag={type:'pinch',d0:Math.hypot(a.x-b.x,a.y-b.y)||1,s0:view.s,m:toModel({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};return;
+  }
+  if(pointers.size>2)return;
+  const p=toModel(e),t=e.target.closest('[data-h],[data-item],[data-op]');
+  moved=false;const base={sx:e.clientX,sy:e.clientY};
+  if(!t){drag={type:'pan',...base,vx:view.x,vy:view.y};svg.style.cursor='grabbing';return;}
+  const hd=t.dataset.h;
+  if(hd){
+    const it=selItem(),R=state.room;
+    if(hd==='size'&&it){const r=it.rot*Math.PI/180,c=Math.cos(r),s=Math.sin(r);drag={type:'size',...base,id:it.id,ax:it.x-it.w/2*c+it.d/2*s,ay:it.y-it.w/2*s-it.d/2*c};}
+    else if(hd==='rot'&&it)drag={type:'rot',...base,id:it.id};
+    else drag={type:hd,...base,ox:R.w-p.x,oy:R.d-p.y};
+    return;
+  }
+  if(t.dataset.item){
+    const it=state.items.find(i=>i.id===t.dataset.item);if(!it)return;
+    if(!isSel('item',it.id))setSel({kind:'item',id:it.id});
+    drag={type:'item',...base,id:it.id,dx:p.x-it.x,dy:p.y-it.y};return;
+  }
+  if(t.dataset.op){
+    const op=state.openings.find(o=>o.id===t.dataset.op);if(!op)return;
+    if(!isSel('op',op.id))setSel({kind:'op',id:op.id});
+    const along=(op.wall==='top'||op.wall==='bottom')?p.x:p.y;
+    drag={type:'op',...base,id:op.id,wall0:op.wall,grab:along-op.offset-op.width/2};
+  }
+});
+svg.addEventListener('pointermove',e=>{
+  if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(!drag)return;
+  if(drag.type==='pinch'){
+    if(pointers.size<2)return;const [a,b]=[...pointers.values()],r=svg.getBoundingClientRect();
+    const ns=clamp(drag.s0*Math.hypot(a.x-b.x,a.y-b.y)/drag.d0,0.05,20);
+    view.s=ns;view.x=drag.m.x-((a.x+b.x)/2-r.left)/ns;view.y=drag.m.y-((a.y+b.y)/2-r.top)/ns;applyView();renderScene();return;
+  }
+  if(!moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<3)return;
+  moved=true;
+  const p=toModel(e),R=state.room;
+  switch(drag.type){
+    case 'pan':view.x=drag.vx-(e.clientX-drag.sx)/view.s;view.y=drag.vy-(e.clientY-drag.sy)/view.s;applyView();return;
+    case 'item':{
+      const it=state.items.find(i=>i.id===drag.id);if(!it)return;
+      it.x=snapV(p.x-drag.dx);it.y=snapV(p.y-drag.dy);
+      const b=bbox(it),thr=10/view.s;
+      if(Math.abs(b.minX)<thr)it.x-=b.minX;else if(Math.abs(b.maxX-R.w)<thr)it.x-=b.maxX-R.w;
+      if(Math.abs(b.minY)<thr)it.y-=b.minY;else if(Math.abs(b.maxY-R.d)<thr)it.y-=b.maxY-R.d;
+      it.x=r1(it.x);it.y=r1(it.y);break;}
+    case 'rot':{
+      const it=state.items.find(i=>i.id===drag.id);if(!it)return;
+      let a=Math.atan2(p.y-it.y,p.x-it.x)*180/Math.PI+90;a=e.shiftKey?Math.round(a):Math.round(a/15)*15;
+      it.rot=((a%360)+360)%360;break;}
+    case 'size':{
+      const it=state.items.find(i=>i.id===drag.id);if(!it)return;
+      const r=it.rot*Math.PI/180,c=Math.cos(r),s=Math.sin(r),dx=p.x-drag.ax,dy=p.y-drag.ay;
+      const min=it.shape==='L'?it.arm+10:10;
+      const nw=Math.max(min,snapV(dx*c+dy*s)),nd=Math.max(min,snapV(-dx*s+dy*c));
+      it.w=nw;it.d=nd;it.x=r1(drag.ax+nw/2*c-nd/2*s);it.y=r1(drag.ay+nw/2*s+nd/2*c);break;}
+    case 'rc':R.w=Math.max(30,snapV(p.x+drag.ox));R.d=Math.max(30,snapV(p.y+drag.oy));break;
+    case 'rr':R.w=Math.max(30,snapV(p.x+drag.ox));break;
+    case 'rb':R.d=Math.max(30,snapV(p.y+drag.oy));break;
+    case 'op':{
+      const op=state.openings.find(o=>o.id===drag.id);if(!op)return;const T=R.wall;
+      let best=null;
+      for(const [wall,perp,along] of [['top',Math.abs(p.y+T/2),p.x],['bottom',Math.abs(p.y-R.d-T/2),p.x],['left',Math.abs(p.x+T/2),p.y],['right',Math.abs(p.x-R.w-T/2),p.y]]){
+        const L=wallLen(wall),outd=along<0?-along:along>L?along-L:0,dist=perp+outd;
+        if(!best||dist<best.dist)best={wall,dist,along};
+      }
+      op.wall=best.wall;const L=wallLen(op.wall);
+      if(op.width>L)op.width=L;
+      op.offset=clamp(snapV(best.along-op.width/2-(op.wall===drag.wall0?drag.grab:0)),0,L-op.width);break;}
+  }
+  renderScene();updatePanelValues();
+});
+function endPtr(e){
+  pointers.delete(e.pointerId);
+  if(!drag)return;
+  if(drag.type==='pinch'){if(pointers.size<2)drag=null;return;}
+  const d=drag;drag=null;svg.style.cursor='';
+  if(d.type==='pan'){if(!moved&&sel)setSel(null);return;}
+  if(moved){commit();renderPanels();}
+}
+svg.addEventListener('pointerup',endPtr);
+svg.addEventListener('pointercancel',endPtr);
+svg.addEventListener('wheel',e=>{e.preventDefault();zoomAt(toModel(e),Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0015)));},{passive:false});
+
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea,select'))return;
+  const mod=e.ctrlKey||e.metaKey,k=e.key.toLowerCase();
+  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return;}
+  if(mod&&k==='y'){e.preventDefault();redo();return;}
+  if(mod&&k==='d'){e.preventDefault();duplicate();return;}
+  if(e.key==='Escape'){if(!$('modal').hidden)$('modal').hidden=true;else if(sel)setSel(null);return;}
+  if(!$('modal').hidden)return;
+  if(e.key==='Delete'||e.key==='Backspace'){if(sel){e.preventDefault();deleteSel();}return;}
+  if(k==='r'&&!mod){rotateSel(e.shiftKey?-90:90);return;}
+  const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+  if(arrows[e.key]&&sel){
+    e.preventDefault();const st=e.shiftKey?10:1,[dx,dy]=arrows[e.key],it=selItem(),op=selOp();
+    if(it){it.x=r1(it.x+dx*st);it.y=r1(it.y+dy*st);}
+    else if(op){const hor=op.wall==='top'||op.wall==='bottom';op.offset+=(hor?dx:dy)*st;}
+    commit();renderScene();updatePanelValues();renderLists();
+  }
+});
+
+/* ---------- init ---------- */
+(function presets(){
+  let h='',cat='';
+  PRESETS.forEach((p,i)=>{
+    if(p.cat!==cat){if(cat)h+='</div>';cat=p.cat;h+=`<div class="cat">${cat}</div><div class="presets">`;}
+    const sz=p.shape==='circle'&&p.w===p.d?`Ø ${p.w} cm`:`${p.w} × ${p.d} cm`;
+    h+=`<button class="preset" data-act="preset" data-i="${i}"><b>${p.name}</b><small>${sz}</small></button>`;
+  });
+  $('presetBox').innerHTML=h+'</div>';
+})();
+renderPanels();
+let fitted=false;
+new ResizeObserver(()=>{if(!fitted){fitted=true;fit();}else{applyView();renderScene();}}).observe(stage);
+})();
+</script>
+</body>
+</html>
